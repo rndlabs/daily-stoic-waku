@@ -65,9 +65,6 @@ function requestDailyStoic() {
     # Encode the message with protoc using the `Request` type from the `dailystoic.proto` file
     PAYLOAD=$(echo $MESSAGE | protoc --encode=Request dailystoic.proto | xxd -p)
 
-    # prefix payload with 0x
-    # PAYLOAD="0x$PAYLOAD"
-
     PARAMS='["'"$PUBSUB_TOPIC"'",{"payload":"'"$PAYLOAD"'","contentTopic":"'"$REQUEST_CONTENT_TOPIC"'","timestamp":'"$NOW"'}]'
     REQUEST='{"jsonrpc":"2.0","method":"'"$METHOD"'","params":'"$PARAMS"',"id":2}'
 
@@ -81,11 +78,13 @@ function requestDailyStoic() {
 #1. Check for the required dependencies
 checkDependencies
 
+trap unsubscribe EXIT # 2. Trap the exit signal and unsubscribe from the topic
+setupSubscription # 3. Setup the subscription
 
-# 2. Request a daily stoic message
+# 4. Request a daily stoic message
 requestDailyStoic
 
-# 3. Poll the JSON-RPC interface for messages
+# 5. Poll the JSON-RPC interface for messages
 while true; do
     METHOD="get_waku_v2_relay_v1_messages" # The JSON-RPC method to call to poll for messages
     PARAMS='["'"$PUBSUB_TOPIC"'"]' # The JSON-RPC parameters as an array consisting of the topic
