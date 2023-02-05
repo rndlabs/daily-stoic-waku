@@ -7,6 +7,32 @@ PUBSUB_TOPIC="/waku/2/default-waku/proto"
 CONTENT_TOPIC="/dailystoic/1/broadcast/proto"
 REQUEST_CONTENT_TOPIC="/dailystoic/1/request/proto"
 
+# A function that checks for the required dependencies
+function checkDependencies() {
+    # Check if jq is installed
+    if ! [ -x "$(command -v jq)" ]; then
+        log ERROR "jq is not installed."
+        exit 1
+    fi
+
+    # Check if protoc is installed
+    if ! [ -x "$(command -v protoc)" ]; then
+        log ERROR "protoc is not installed."
+        exit 1
+    fi
+
+    # Check if xxd is installed
+    if ! [ -x "$(command -v xxd)" ]; then
+        log ERROR "xxd is not installed."
+        exit 1
+    fi
+}
+
+# A function used for logging that prefixes the message with the current time and log level
+function log() {
+    echo "$(date +"%Y-%m-%d %H:%M:%S") $1 $2"
+}
+
 # A function that sets up the subscription
 function setupSubscription() {
     METHOD="post_waku_v2_relay_v1_subscriptions" # The JSON-RPC method to call to subscribe to a `PubSub` topic.
@@ -50,8 +76,9 @@ function requestDailyStoic() {
     echo "Response: $RESPONSE"
 }
 
-trap unsubscribe EXIT # 0. Trap the exit signal and unsubscribe from the topic
-setupSubscription # 1. Setup the subscription
+#1. Check for the required dependencies
+checkDependencies
+
 
 # 2. Request a daily stoic message
 requestDailyStoic
