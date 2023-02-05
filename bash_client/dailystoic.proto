@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+message Request {
+    uint64 timestamp = 1;
+}
+
+message Broadcast {
+    uint64 timestamp = 1;
+    string author = 2;
+    bytes content = 3;
+}

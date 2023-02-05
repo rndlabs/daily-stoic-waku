@@ -2,11 +2,11 @@ use chrono::{DateTime, LocalResult, TimeZone, Utc};
 use prost::Message;
 use waku_bindings::{Encoding, WakuContentTopic};
 
-pub static DAILY_STOIC_CONTENT_TOPIC: WakuContentTopic = 
-    WakuContentTopic::new("daily-stoic", 1, "broadcast", Encoding::Proto);
-
 pub static DAILY_STOIC_REQUEST_CONTENT_TOPIC: WakuContentTopic = 
-    WakuContentTopic::new("daily-stoic", 1, "request", Encoding::Proto);
+    WakuContentTopic::new("dailystoic", 1, "request", Encoding::Proto);
+
+pub static DAILY_STOIC_CONTENT_TOPIC: WakuContentTopic = 
+    WakuContentTopic::new("dailystoic", 1, "broadcast", Encoding::Proto);
 
 #[derive(Clone, Message)]
 pub struct DailyStoic {
@@ -20,6 +20,8 @@ pub struct DailyStoic {
 
 #[derive(Clone, Message)]
 pub struct DailyStoicRequest {
+    #[prost(uint64, tag = "1")]
+    timestamp: u64
 }
 
 impl DailyStoic {
