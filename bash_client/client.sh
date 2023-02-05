@@ -1,8 +1,20 @@
 #!/bin/sh
 # A bash client for polling the JSON-RPC interface of nwaku
 
-# The URL of the JSON-RPC interface
-URL="http://nwaku.nwaku.public.dappnode:8545"
+# Set the URL of the JSON-RPC interface in order of priority:
+# 1. The second argument (the first argument is the script name)
+# 2. The environment variable NWAKU_URL
+# 3. The default URL
+
+if [ ! -z "$2" ]; then
+    URL=$2
+elif [ ! -z "$NWAKU_URL" ]; then
+    URL=$NWAKU_URL
+else
+    URL="http://nwaku.nwaku.public.dappnode:8545"
+fi
+
+# PubSub and content topics
 PUBSUB_TOPIC="/waku/2/default-waku/proto"
 CONTENT_TOPIC="/dailystoic/1/broadcast/proto"
 REQUEST_CONTENT_TOPIC="/dailystoic/1/request/proto"
