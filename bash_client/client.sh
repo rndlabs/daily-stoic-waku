@@ -39,8 +39,10 @@ function setupSubscription() {
     PARAMS='[["'"$PUBSUB_TOPIC"'"]]' # The JSON-RPC parameters is TOPIC as a string
     REQUEST='{"jsonrpc":"2.0","method":"'"$METHOD"'","params":'"$PARAMS"',"id":1}'
 
-    echo $REQUEST
-    curl -s -X POST -H 'Content-Type: application/json' --data "$REQUEST" "$URL"
+    # Inform the user that we are subscribing to the topic
+    log INFO "Subscribing to the PubSub topic $PUBSUB_TOPIC and monitoring the content topic $CONTENT_TOPIC..."
+
+    curl -s -X POST -H 'Content-Type: application/json' --data "$REQUEST" "$URL" > /dev/null
 }
 
 # A function that unsubscribes from a `PubSub` topic.
@@ -49,7 +51,7 @@ function unsubscribe() {
     PARAMS='[["'"$PUBSUB_TOPIC"'"]]' # The JSON-RPC parameters
     REQUEST='{"jsonrpc":"2.0","method":"'"$METHOD"'","params":'"$PARAMS"',"id":1}'
 
-    curl -s -X DELETE -H 'Content-Type: application/json' --data "$REQUEST" "$URL"
+    curl -s -X DELETE -H 'Content-Type: application/json' --data "$REQUEST" "$URL" > /dev/null
 }
 
 # A function that makes the request for a daily stoic message
@@ -69,11 +71,11 @@ function requestDailyStoic() {
     PARAMS='["'"$PUBSUB_TOPIC"'",{"payload":"'"$PAYLOAD"'","contentTopic":"'"$REQUEST_CONTENT_TOPIC"'","timestamp":'"$NOW"'}]'
     REQUEST='{"jsonrpc":"2.0","method":"'"$METHOD"'","params":'"$PARAMS"',"id":2}'
 
-    echo $REQUEST
-    # Store the response
-    RESPONSE=$(curl -s -X POST -H 'Content-Type: application/json' --data "$REQUEST" "$URL")
+    # Inform the user that we are requesting a daily stoic message
+    log INFO "Requesting a daily stoic message..."
 
-    echo "Response: $RESPONSE"
+    # Send the request, we don't need the response
+    curl -s -X POST -H 'Content-Type: application/json' --data "$REQUEST" "$URL" > /dev/null
 }
 
 #1. Check for the required dependencies
@@ -98,7 +100,6 @@ while true; do
         # `contentTopic` property that starts with `/dailystoic`
         RESPONSE=$(echo $RESPONSE | jq '.result | map(select(.contentTopic | startswith("/dailystoic/1/broadcast/proto")))')
 
-        echo $RESPONSE
         # Response is an array of objects, so we need to iterate over it
         # Each object has a `payload` property that is a base64 encoded string
         # We need to decode the string and print it
@@ -128,8 +129,15 @@ while true; do
             # Extract the message which [:graph:] and [:space:]
             MESSAGE=$(echo $PAYLOAD | grep -oP '3: "\K([[:graph:][:space:]]+?)"' | tr -d '"' | sed 's/\\//g')
 
-            echo $TIMESTAMP
-            echo $MESSAGE - $AUTHOR
+            # Print a new line
+            echo
+
+            # Pretty print the message, making the tags bold
+            echo -e "\e[1mDate:\e[0m $TIMESTAMP"
+            echo -e "\e[1mDaily Stoic:\e[0m \e[3m\e[1m$MESSAGE\e[0m - \e[1m\e[3m$AUTHOR\e[0m"
+
+            # Print a new line
+            echo
         done
     fi
 
