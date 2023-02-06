@@ -1,5 +1,5 @@
 [package]
-name = "daily-stoic"
+name = "dailystoic"
 version = "0.1.0"
 edition = "2021"
 
@@ -9,6 +9,9 @@ edition = "2021"
 chrono = "0.4.23"
 hex = "0.4.3"
 prost = "0.11.6"
+rand = "0.8.5"
+serde = "1.0.152"
+serde_json = "1.0.92"
 tokio = { version = "1.25.0", features = ["sync", "macros", "rt-multi-thread", "time"] }
 url = "2.3.1"
 waku-bindings = "0.1.0-beta3"
