@@ -1,0 +1,15 @@
+{
+    "name": "dailystoic.public.dappnode.eth",
+    "version": "0.1.0",
+    "architectures": ["linux/amd64"],
+    "description": "A service for publishing the daily stoic quote",
+    "shortDescription": "Daily stoic Waku",
+    "type": "service",
+    "author": "rndlabs <packages@rndlabs.xyz> (https://github.com/rndlabs)",
+    "contributors": [
+      "mfw78 <mfw78@rndlabs.xyz> (https://github.com/mfw78)"
+    ],
+    "categories": ["Communications"],
+    "license": "GPL-3.0"
+  }
+  
