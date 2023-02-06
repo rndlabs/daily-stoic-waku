@@ -6,7 +6,7 @@
 # 2. The environment variable NWAKU_URL
 # 3. The default URL
 
-if [ ! -z "$2" ]; then
+if [ ! -z "$1" ]; then
     URL=$2
 elif [ ! -z "$NWAKU_URL" ]; then
     URL=$NWAKU_URL
