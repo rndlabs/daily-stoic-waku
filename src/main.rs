@@ -14,7 +14,7 @@ use crate::protocol::{
     DailyStoic, DailyStoicRequest, DAILY_STOIC_CONTENT_TOPIC, DAILY_STOIC_REQUEST_CONTENT_TOPIC,
 };
 use waku_bindings::{
-    waku_new, waku_set_event_callback, ProtocolId, Running, WakuMessage, WakuNodeHandle,
+    waku_new, waku_set_event_callback, ProtocolId, Running, WakuMessage, WakuNodeHandle, WakuNodeConfig, WakuPubSubTopic,
 };
 
 #[derive(Deserialize, Debug)]
@@ -32,9 +32,19 @@ struct App {
 pub static ENRTREE: &str =
     "enrtree://AOGECG2SPND25EEFMAJ5WF3KSGJNSGV356DSTL2YVLLZWIV6SAYBM@prod.waku.nodes.status.im";
 
+/// The pubsub topic on which to use relay for daily stoic requests
+pub static PUBSUB: &str = "/waku/2/dev-waku/proto";
+
 /// Setup a waku node and connect to the waku fleet
 fn setup_node_handle() -> Result<WakuNodeHandle<Running>, Box<dyn Error>> {
-    let node_handle = waku_new(None)?;
+    let mut config: WakuNodeConfig = WakuNodeConfig::default();
+    config.discv5 = Some(true);
+    config.discv5_udp_port = Some(9010);
+
+    let pubsub_topic: WakuPubSubTopic = PUBSUB.parse()?;
+    config.relay_topics = vec![pubsub_topic];
+
+    let node_handle = waku_new(Some(config))?;
     let node_handle = node_handle.start()?;
 
     // Get the addresses of the waku fleet via the enrtree
@@ -44,7 +54,7 @@ fn setup_node_handle() -> Result<WakuNodeHandle<Running>, Box<dyn Error>> {
     for address in addresses {
         let peer_id = node_handle.add_peer(&address, ProtocolId::Relay)?;
         node_handle
-            .connect_peer_with_id(peer_id, None)
+            .connect_peer_with_id(&peer_id, None)
             .unwrap_or_else(|e| {
                 let mut out = std::io::stderr();
                 write!(out, "Error, couldn't connect to peer {e:?}").unwrap();
