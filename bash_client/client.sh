@@ -15,7 +15,7 @@ else
 fi
 
 # PubSub and content topics
-PUBSUB_TOPIC="/waku/2/default-waku/proto"
+PUBSUB_TOPIC="/waku/2/dev-waku/proto"
 CONTENT_TOPIC="/dailystoic/1/broadcast/proto"
 REQUEST_CONTENT_TOPIC="/dailystoic/1/request/proto"
 
